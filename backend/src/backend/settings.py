@@ -38,9 +38,8 @@ class Settings(BaseSettings):
             )
         if self.gcp_region and "GCP_REGION" not in os.environ:
             os.environ["GCP_REGION"] = self.gcp_region
-        if self.llm_model.startswith("google-vertex:") and os.environ.get(
-            "GOOGLE_APPLICATION_CREDENTIALS"
-        ):
+        # Setup Google credentials for Vertex AI when credentials are provided
+        if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
             from .llm.google_credentials import setup_google_credentials
 
             setup_google_credentials()
@@ -48,8 +47,8 @@ class Settings(BaseSettings):
 
     # LLM Configuration
     llm_model: str = Field(
-        default="openai:gpt-5-mini",
-        description="LLM model to use (e.g., 'openai:gpt-5-mini', 'google-gla:gemini-2.5-flash', 'google-vertex:gemini-2.5-flash')",
+        default="gemini-2.5-flash",
+        description="LLM model to use for ADK (e.g., 'gemini-2.5-flash'). Backend is controlled by GOOGLE_GENAI_USE_VERTEXAI env var.",
     )
 
     adk_app_name: str = Field(
