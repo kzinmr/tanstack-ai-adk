@@ -16,7 +16,7 @@ from google.adk.sessions.in_memory_session_service import InMemorySessionService
 from .adapters.adk_to_tanstack import TanStackAdkAdapter
 from .adapters.tanstack_stream import DoneStreamChunk, encode_chunk, encode_done, now_ms
 from .adapters.tanstack_to_adk import extract_user_text
-from .agent import create_runner
+from .agents.sql_agent.agent import create_runner
 from .continuation import ContinuationHub
 from .db import get_db_connection
 from .deps import Deps

@@ -37,6 +37,76 @@ Maintain a single Continuity Ledger for this workspace in `CONTINUITY.md`. The l
 - Open questions (UNCONFIRMED if needed):
 - Working set (files/ids/commands):
 
+## ADK usage
+
+### Agent Structure Convention (Required)
+
+**All agent directories must follow this structure:**
+```
+my_agent/
+├── __init__.py # MUST contain: "from . import agent"
+└── agent.py.   # MUST define: "root_agent = Agent(...) OR app = App(...)"
+```
+
+**Choose one pattern based on your needs:**
+
+**Option 1 - Simple Agent (for basic agents without plugins):**
+```python
+from google.adk.agents import Agent
+from google.adk.tools import google_search
+
+root_agent = Agent(
+  name="search_assistant",
+  model="gemini-2.5-flash",
+  instruction="You are a helpful assistant.",
+  description="An assistant that can search the web.",
+  tools=[google_search]
+)
+```
+
+**Option 2 - App Pattern (when you need plugins, event compaction, custom configuration):**
+```python
+from google.adk import Agent
+from google.adk.apps import App
+from google.adk.plugins import ContextFilterPlugin
+
+root_agent = Agent(
+  name="my_agent",
+  model="gemini-2.5-flash",
+  instruction="You are a helpful assistant.",
+  tools=[...],
+)
+app = App(
+  name="my_app",
+  root_agent=root_agent,
+  plugins=[ContextFilterPlugin(num_invocations_to_keep=3),],
+)
+```
+
+**Rationale:** This structure allows the ADK CLI (`adk web`, `adk run`, etc.) to automatically discover and load agents without additional configuration.
+
+### Running Agents Locally
+
+**For interactive development and debugging via web UI:**
+```bash
+adk web path/to/agents_dir
+```
+
+**For CLI-based testing (prompts for user input):**
+```bash
+adk run path/to/my_agent
+```
+
+**For API/production mode:**
+```bash
+adk api_server path/to/agents_dir
+```
+
+**For running evaluations:**
+```bash
+adk eval path/to/my_agent path/to/eval_set.json
+```
+
 ## Code Conventions
 
 ### Testing Philosophy
