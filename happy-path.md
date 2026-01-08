@@ -3,8 +3,6 @@ sequenceDiagram
   participant U as User
   participant FE as Frontend (useChat/useChatSession)
   participant BE as Backend (FastAPI /api/chat)
-  participant AD as TanStackAIAdapter (tanstack_pydantic_ai)
-  participant AG as pydantic-ai Agent
   participant DB as Postgres
   participant AS as ArtifactStore (memory/S3 via /api/data)
 
