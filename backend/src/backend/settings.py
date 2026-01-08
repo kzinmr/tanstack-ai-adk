@@ -7,7 +7,7 @@ Settings are loaded from environment variables and .env file.
 import os
 from functools import lru_cache
 
-from pydantic import Field, PostgresDsn, model_validator
+from pydantic import AliasChoices, Field, PostgresDsn, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -32,12 +32,24 @@ class Settings(BaseSettings):
                 os.environ["GEMINI_API_KEY"] = self.gemini_api_key
             if "GOOGLE_API_KEY" not in os.environ:
                 os.environ["GOOGLE_API_KEY"] = self.gemini_api_key
+        if self.google_application_credentials:
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = (
+                self.google_application_credentials
+            )
+        if self.gcp_region and "GCP_REGION" not in os.environ:
+            os.environ["GCP_REGION"] = self.gcp_region
+        if self.llm_model.startswith("google-vertex:") and os.environ.get(
+            "GOOGLE_APPLICATION_CREDENTIALS"
+        ):
+            from .llm.google_credentials import setup_google_credentials
+
+            setup_google_credentials()
         return self
 
     # LLM Configuration
     llm_model: str = Field(
         default="openai:gpt-5-mini",
-        description="LLM model to use (e.g., 'openai:gpt-5-mini', 'google-gla:gemini-2.5-flash')",
+        description="LLM model to use (e.g., 'openai:gpt-5-mini', 'google-gla:gemini-2.5-flash', 'google-vertex:gemini-2.5-flash')",
     )
 
     adk_app_name: str = Field(
@@ -57,6 +69,15 @@ class Settings(BaseSettings):
     gemini_api_key: str | None = Field(
         default=None,
         description="Google Gemini API key",
+    )
+    google_application_credentials: str | None = Field(
+        default=None,
+        description="Google service account JSON (string or file path) for Vertex AI.",
+    )
+    gcp_region: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("GCP_REGION", "GOOGLE_CLOUD_LOCATION"),
+        description="GCP region for Vertex AI (e.g., us-central1).",
     )
 
     # Database Configuration

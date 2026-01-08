@@ -1,26 +1,33 @@
 Goal (incl. success criteria):
-- Reimplement tanstack-ai demo features in ../tanstack-ai-demo based on ADK (not pydantic-ai), following tanstack-ai-adk-plan.md, and move agent implementations under the ADK-prescribed agents/<agent_name>/agent.py layout with root_agent exports.
+- Add Gemini on Vertex AI credential support following ADK patterns and call-insight-chat reference implementation.
+- Success: Settings class supports GOOGLE_APPLICATION_CREDENTIALS, GCP_PROJECT, GCP_REGION; credentials propagate correctly to ADK.
 Constraints/Assumptions:
-- Use instructions from AGENTS.md and CLAUDE.md.
-- Must update CONTINUITY.md at start of every assistant turn and when state changes.
-- Environment: exe.dev VM. Approval policy never; sandbox danger-full-access; network enabled.
+- Follow AGENTS.md/CLAUDE.md instructions; update CONTINUITY.md at start of each turn and when state changes.
+- Environment: exe.dev VM; approval_policy on-request; sandbox_mode workspace-write; network_access restricted.
+- Reference: ../call-insight-chat/backend/src/backend/llm/google_credentials.py pattern.
 Key decisions:
-- Use tanstack-ai-adk-plan.md as design doc for implementation details.
-- Target ADK package is google-adk (v1.21.0 per PyPI download). (UNCONFIRMED exact version in repo)
+- Use Pydantic Settings for credential fields (google_application_credentials, gcp_project, gcp_region).
+- Create google_credentials.py helper to parse JSON string or file path.
+- Propagate credentials to os.environ in @model_validator for ADK consumption.
 State:
-- ADK backend/frontend reimplementation done in tanstack-ai-demo; agent layout moved under backend/src/backend/agents/sql_agent.
+- Completed Vertex AI credential integration.
 Done:
-- Read AGENTS.md instructions from user message.
-- Verified CONTINUITY.md did not exist and created it.
- - Read tanstack-ai-adk-plan.md and ADK API (google-adk wheel) for implementation details.
- - Updated tanstack-ai-demo backend/frontend to use ADK and /api/continuation flow.
- - Moved tanstack-ai-demo agent implementation under backend/src/backend/agents/sql_agent.
+- Explored credential setup patterns in both codebases.
+- Added google_application_credentials and gcp_region fields to Settings (settings.py:73-81).
+- Created backend/src/backend/llm/google_credentials.py helper module.
+- Updated @model_validator to propagate Vertex AI credentials and call setup_google_credentials() (settings.py:35-46).
+- Updated .env.example with GOOGLE_APPLICATION_CREDENTIALS and GCP_REGION examples (lines 5-8).
+- Updated llm_model description to include google-vertex:* examples (settings.py:52).
+- Tested Settings class loading successfully.
 Now:
-- Confirm any follow-up adjustments or tests needed for new agent layout.
+- Implementation complete.
 Next:
-- Optional: update legacy docs (approval-continuation-decision.md, happy-path.md) if desired.
+- None (task completed).
 Open questions (UNCONFIRMED if needed):
-- Should any legacy docs (pydantic-ai references) be fully updated beyond README?
+- None.
 Working set (files/ids/commands):
 - /home/exedev/tanstack-ai-adk/CONTINUITY.md
-- /home/exedev/tanstack-ai-adk/tanstack-ai-adk-plan.md
+- /home/exedev/tanstack-ai-adk/backend/src/backend/settings.py
+- /home/exedev/tanstack-ai-adk/backend/.env.example
+- /home/exedev/call-insight-chat/backend/src/backend/settings.py
+- /home/exedev/call-insight-chat/backend/src/backend/llm/google_credentials.py
